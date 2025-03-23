@@ -2,14 +2,9 @@ package ru.pratice.pet_project.personal_finance_management_system.services.excep
 
 import lombok.Getter;
 
-import java.time.LocalTime;
-
 @Getter
 public class InvalidRequestException extends RuntimeException {
-    private final LocalTime time;
-
-    public InvalidRequestException(String message, LocalTime time) {
+    public InvalidRequestException(String message) {
         super(message);
-        this.time = time;
     }
 }

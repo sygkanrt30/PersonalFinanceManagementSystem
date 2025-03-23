@@ -6,10 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.categories.Category;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.categories.CategoryRepository;
-import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
+import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.EntityAlreadyExistsException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
@@ -24,11 +23,11 @@ public class CategoryService {
 
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Category with id: " + id + " not found", LocalTime.now()));
+                () -> new ResourceNotFoundException("Category with id: " + id + " not found"));
     }
 
-    public boolean getCategoryByCategoryId(Category category) {
-        return categoryRepository.findByCategoryId(category.getCategoryId()).isPresent();
+    public boolean isCategoryExistsByCategoryId(Long categoryId) {
+        return categoryRepository.findByCategoryId(categoryId).isPresent();
     }
 
     public void deleteAllCategories() {
@@ -36,57 +35,34 @@ public class CategoryService {
     }
 
     public void deleteCategoryById(Long id) {
-        if (categoryRepository.existsById(id)) {
-            log.info("Deleting category with id: {}", id);
-            categoryRepository.deleteById(id);
-        } else {
-            throw new ResourceNotFoundException("Category with id: " + id + " not found", LocalTime.now());
-        }
+        isCategoryExistsById(id);
+        log.info("Deleting category with id: {}", id);
+        categoryRepository.deleteById(id);
     }
 
-    public Category saveCategory(Category category) {
+    public void saveCategory(Category category) {
+        category.setName(category.getName().trim());
         try {
-            category.setName(category.getName().trim());
-            checkCategoryFields(category);
-        } catch (NullPointerException e) {
-            log.error(e.getMessage(), e);
-            throw new InvalidEntityException("Category fields can't be empty", LocalTime.now());
+            categoryRepository.save(category);
+        } catch (Exception e) {
+            throw new EntityAlreadyExistsException("Category fields make duplicate");
         }
         log.info("Saving category {}", category);
-        return categoryRepository.save(category);
     }
 
     @Transactional
     public void updateName(Long id, String name) {
-        if (categoryRepository.existsById(id)) {
-            try {
-                isNameMakeDuplicate(name.trim());
-            } catch (NullPointerException e) {
-                log.error(e.getMessage(), e);
-                throw new InvalidEntityException("Category's name can't be null", LocalTime.now());
-            }
-            categoryRepository.update(id, name.trim());
-            log.info("Updating category with id: {}", id);
-        } else {
-            throw new ResourceNotFoundException("Category with id: " + id + " not found", LocalTime.now());
+        isCategoryExistsById(id);
+        try {
+            categoryRepository.update(id, name);
+        } catch (Exception e) {
+            throw new EntityAlreadyExistsException("Category fields make duplicate");
         }
+        log.info("Updating category with id: {}", id);
     }
 
-    private boolean isNameMakeDuplicate(String name) {
-        return categoryRepository.findCategoryByName(name).isPresent();
-    }
-
-    private boolean isCategoryIdMakeDuplicate(Long categoryId) {
-        return categoryRepository.findCategoryByCategory_id(categoryId).isPresent();
-    }
-
-    private void checkCategoryFields(Category category) {
-        if (isNameMakeDuplicate(category.getName())) {
-            throw new InvalidEntityException("Category with name: " + category.getName() + " already exists",
-                    LocalTime.now());
-        } else if (isCategoryIdMakeDuplicate(category.getCategoryId())) {
-            throw new InvalidEntityException("Category with category_id: " + category.getCategoryId() + " already exists",
-                    LocalTime.now());
-        }
+    private void isCategoryExistsById(Long id) {
+        if (!categoryRepository.existsById(id))
+            throw new ResourceNotFoundException("Category with id: " + id + " not found");
     }
 }

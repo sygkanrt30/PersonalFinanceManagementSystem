@@ -14,24 +14,37 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     @Query(value = "select * from transactions where owner = :owner", nativeQuery = true)
-    List<Transaction> findTransactionsByOwnerName(@NonNull String owner);
+    List<Transaction> findTransactionsByUsername(@NonNull String owner);
 
-    @Query(value = "select * from transactions where type = :type", nativeQuery = true)
-    List<Transaction> findTransactionByType(@NonNull String type);
-
-    @Query(value = "select * from transactions where category_id = :category", nativeQuery = true)
-    List<Transaction> findTransactionByCategoryId(@NonNull Category category);
+    @Query(value = "select * from transactions " +
+            "where category_id = :category and name = :name and type = :type", nativeQuery = true)
+    List<Transaction> findTransactionByCategoryId(@NonNull Category category,
+                                                  @NonNull  String name,
+                                                  @NonNull String type);
 
     @Query(value = "select * from transactions where date = :localDate", nativeQuery = true)
     List<Transaction> findTransactionByDate(@NonNull LocalDate localDate);
 
-    @Modifying
-    @Query(value = "delete from transactions where owner = :owner", nativeQuery = true)
-    void deleteTransactionByOwner(@NonNull String owner);
+    @Query(value = "select * from transactions where type = :type and owner = :username", nativeQuery = true)
+    List<Transaction> findTransactionsByType(@NonNull String username, @NonNull String type);
+
+    @Query(value = "select * from transactions where type = :type and owner = :name and date = :date", nativeQuery = true)
+    List<Transaction> findTransactionByDate(String name, String type, LocalDate date);
+
+    @Query(value = "select * from transactions " +
+            "where type = :type and owner = :name and date = :date and category_id = :category", nativeQuery = true)
+    List<Transaction> findTransactionByCategoryIdAndDate(@NonNull String name,
+                                                         @NonNull String type,
+                                                         @NonNull LocalDate date,
+                                                         @NonNull Category category);
 
     @Modifying
-    @Query(value = "delete from transactions where type = :type", nativeQuery = true)
-    void deleteTransactionByType(@NonNull String type);
+    @Query(value = "delete from transactions where owner = :owner", nativeQuery = true)
+    void deleteTransactionByUsername(@NonNull String owner);
+
+    @Modifying
+    @Query(value = "delete from transactions where type = :type and owmer = :owner", nativeQuery = true)
+    void deleteTransactionByType(@NonNull String type, @NonNull String owner);
 
     @Modifying
     @Query(value = "update transactions set " +

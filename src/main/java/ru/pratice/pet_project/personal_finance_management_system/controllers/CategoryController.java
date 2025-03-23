@@ -34,13 +34,12 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category saveCategory(@RequestBody Category category) {
-        return categoryService.saveCategory(category);
+    public void saveCategory(@RequestBody Category category) {
+        categoryService.saveCategory(category);
     }
 
-    @PatchMapping(path = "{id}")
-    public void updateCategory(@PathVariable(name = "id") Long id,
-                               @RequestParam(required = false) String name) {
-        categoryService.updateName(id, name);
+    @PatchMapping("/update_name")
+    public void updateCategory(@RequestParam Long id, @RequestParam String name) {
+        categoryService.updateName(id, name.trim());
     }
 }

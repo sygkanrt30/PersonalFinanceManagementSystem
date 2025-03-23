@@ -9,5 +9,6 @@ public class PersonalFinanceManagementSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PersonalFinanceManagementSystemApplication.class, args);
 	}
-
 }
+//todo отправка сообщения на почту если лимит превышен
+//todo внедрить лимиты в мое rest api

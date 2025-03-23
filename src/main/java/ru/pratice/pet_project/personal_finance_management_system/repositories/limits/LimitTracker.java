@@ -1,4 +1,4 @@
-package ru.pratice.pet_project.personal_finance_management_system.repositories.users;
+package ru.pratice.pet_project.personal_finance_management_system.repositories.limits;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,14 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
 
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class User {
+@Table(name = "limits")
+public class LimitTracker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,13 +19,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
     @NonNull
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(name = "limit_amount", nullable = false)
+    private Long limitAmount;
     @NonNull
-    @Column(nullable = false)
-    private String password;
-    @NonNull
-    @Column(nullable = false)
-    private LocalDate birth;
-    private int age;
+    @Column(name = "total_amount", nullable = false)
+    private Long totalAmount;
+
 }

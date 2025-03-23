@@ -10,12 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    @Query(value = "select * from categories where name = :name", nativeQuery = true)
-    Optional<Category> findCategoryByName(String name);
-
-    @Query(value = "select * from categories where category_id = :categoryId", nativeQuery = true)
-    Optional<Category> findCategoryByCategory_id(Long categoryId);
-
     @Modifying
     @Query(value = "update categories set name = :name where id= :id", nativeQuery = true)
     void update(Long id, String name);

@@ -3,10 +3,9 @@ package ru.pratice.pet_project.personal_finance_management_system.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.users.User;
-import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
 import ru.pratice.pet_project.personal_finance_management_system.services.users.UserService;
 
-import java.time.LocalTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -25,14 +24,14 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @GetMapping(path = "name/{name}")
+    @GetMapping(path = "/get_by_name/{name}")
     public User getUserByName(@PathVariable(name = "name") String name) {
-        return userService.getUserByName(name);
+        return userService.getUserByName(name.trim());
     }
 
-    @GetMapping(path = "email/{email}")
+    @GetMapping(path = "/get_by_email/{email}")
     public User getUserByEmail(@PathVariable(name = "email") String email) {
-        return userService.getUserByEmail(email);
+        return userService.getUserByEmail(email.trim());
     }
 
     @DeleteMapping
@@ -45,19 +44,19 @@ public class UserController {
         userService.deleteUserById(id);
     }
 
-    @DeleteMapping(path = "name/{name}")
+    @DeleteMapping(path = "/delete_by_name/{name}")
     public void deleteUserByName(@PathVariable(name = "name") String name) {
-        userService.deleteUserByName(name);
+        userService.deleteUserByName(name.trim());
     }
 
-    @DeleteMapping(path = "email/{email}")
+    @DeleteMapping(path = "/delete_by_email/{email}")
     public void deleteUserByEmail(@PathVariable(name = "email") String email) {
-        userService.deleteUserByEmail(email);
+        userService.deleteUserByEmail(email.trim());
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.create(user);
+    public void createUser(@RequestBody User user) {
+        userService.create(user);
     }
 
     @PutMapping(path = "{id}")
@@ -65,32 +64,27 @@ public class UserController {
         userService.update(id, user);
     }
 
-    @PatchMapping(path = "{id}")
-    public void updatePartOfUser(@PathVariable(name = "id") Long id,
-                                 @RequestParam(required = false) String name,
-                                 @RequestParam(required = false) String email,
-                                 @RequestParam(required = false) String password,
-                                 @RequestParam(required = false) String birth) {
-        int countNotNullParam = 0;
-        if (name != null) {
-            countNotNullParam++;
-            userService.updateName(id, name);
-        }
-        if (email != null) {
-            countNotNullParam++;
-            userService.updateEmail(id, email);
-        }
-        if (password != null) {
-            countNotNullParam++;
-            userService.updatePassword(id, password);
-        }
-        if (birth != null) {
-            countNotNullParam++;
-            userService.updateBirth(id, birth);
-        }
-        if (countNotNullParam == 0) {
-            throw new InvalidEntityException("There are no parameters for changes in the request for changes",
-                    LocalTime.now());
-        }
+    @PatchMapping("/update_username")
+    public void updateUsername(@RequestParam Long id,
+                               @RequestParam String name) {
+        userService.updateName(id, name.trim());
+    }
+
+    @PatchMapping("/update_email")
+    public void updateEmail(@RequestParam Long id,
+                            @RequestParam String email) {
+        userService.updateEmail(id, email.trim());
+    }
+
+    @PatchMapping("/update_password")
+    public void updatePassword(@RequestParam Long id,
+                               @RequestParam String password) {
+        userService.updatePassword(id, password.trim());
+    }
+
+    @PatchMapping("/update_birth_date")
+    public void updateUsername(@RequestParam Long id,
+                               @RequestParam LocalDate birthDate) {
+        userService.updateBirth(id, birthDate);
     }
 }
