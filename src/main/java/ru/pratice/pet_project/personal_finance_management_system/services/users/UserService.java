@@ -9,7 +9,6 @@ import ru.pratice.pet_project.personal_finance_management_system.repositories.li
 import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.TransactionRepository;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.users.User;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.users.UserRepository;
-import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.EntityAlreadyExistsException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 import ru.pratice.pet_project.personal_finance_management_system.services.limits.LimitService;
@@ -125,17 +124,6 @@ public class UserService {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User with id: " + id + " not found");
         }
-    }
-
-    @Transactional
-    public void updateEmail(long id, String email) {
-        isUserExistsById(id);
-        try {
-            userRepository.updateEmail(id, email);
-        } catch (Exception e) {
-            throw new EntityAlreadyExistsException("User's fields make duplicate");
-        }
-        log.info("Updating user email {} with id: {}", email, id);
     }
 
     @Transactional

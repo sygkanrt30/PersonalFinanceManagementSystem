@@ -60,7 +60,7 @@ public class TransactionSaveAndUpdateService {
                     transaction.getUsername(),
                     transaction.getType(),
                     transaction.getAmount(),
-                    transaction.getCategory().getCategoryId());
+                    transaction.getCategory().getId());
             log.info("Updating transaction {} with id: {}", id, transaction);
             updateAmountOfExpenses(id, transaction.getAmount(), true);
             return;
@@ -72,7 +72,7 @@ public class TransactionSaveAndUpdateService {
     private void checkTransaction(Transaction transaction) {
         transactionGetService.checkTypeForCorrectness(transaction.getType());
         checkAmountForCorrectness(transaction.getAmount());
-        isThereCategoryInDatabase(transaction.getCategory().getCategoryId());
+        isThereCategoryInDatabase(transaction.getCategory().getId());
         checkExistenceOfUserByUsername(transaction.getUsername());
     }
 

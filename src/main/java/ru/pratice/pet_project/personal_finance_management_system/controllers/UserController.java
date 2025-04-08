@@ -61,12 +61,6 @@ public class UserController {
         userService.updateName(id, username.trim());
     }
 
-    @PatchMapping("/update_email")
-    public void updateEmail(@RequestParam long id,
-                            @RequestParam String email) {
-        userService.updateEmail(id, email.trim());
-    }
-
     @PatchMapping("/update_password")
     public void updatePassword(@RequestParam long id,
                                @RequestParam String password) {

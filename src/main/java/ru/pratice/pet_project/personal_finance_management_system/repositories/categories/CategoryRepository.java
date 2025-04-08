@@ -14,6 +14,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query(value = "update categories set name = :name where id= :id", nativeQuery = true)
     void update(long id, String name);
 
-    @Query(value = "select * from categories where category_id = :categoryId", nativeQuery = true)
-    Optional<Category> findByCategoryId(long categoryId);
+    @Query(value = "select * from categories where id = :id", nativeQuery = true)
+    Optional<Category> findByCategoryId(long id);
 }

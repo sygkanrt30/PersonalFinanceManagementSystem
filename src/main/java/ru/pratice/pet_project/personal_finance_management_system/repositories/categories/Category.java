@@ -26,15 +26,10 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(name = "category_id", nullable = false)
-    private long categoryId;
-
     @JsonCreator
     public Category(@JsonProperty("id") @NonNull long id,
-                    @JsonProperty("categoryId") @NonNull long categoryId,
                     @JsonProperty("name") @NonNull String name) {
         this.id = id;
-        this.categoryId = categoryId;
         this.name = name;
     }
 
