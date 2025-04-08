@@ -4,27 +4,27 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.limits.LimitRepository;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.limits.LimitTracker;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.TransactionRepository;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.users.User;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.users.UserRepository;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.EntityAlreadyExistsException;
+import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
+import ru.pratice.pet_project.personal_finance_management_system.services.limits.LimitService;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.List;
-import java.util.Optional;
-
+@SuppressWarnings("ALL")
 @Slf4j
 @AllArgsConstructor
 @Service
 public class UserService {
-    private final UserRepository userRepository;
+    UserRepository userRepository;
+    TransactionRepository transactionRepository;
+    LimitRepository limitRepository;
+    LimitService limitService;
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
-    }
-
-    public User getUserById(Long id) {
+    public User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("User with id: " + id + " not found"));
     }
@@ -39,85 +39,96 @@ public class UserService {
                 () -> new ResourceNotFoundException("User with email: " + email + " not found"));
     }
 
-    public void deleteAllUsers() {
-        userRepository.deleteAll();
-    }
-
     @Transactional
-    public void deleteUserById(Long id) {
+    public void deleteUserById(long id) {
         isUserExistsById(id);
+        cleanUpInOtherTables(getUserById(id));
         userRepository.deleteUserById(id);
         log.info("Deleting user with id: {}", id);
+    }
+    private void cleanUpInOtherTables(User user) {
+        transactionRepository.deleteTransactionByUsername(user.getUsername());
+        log.info("Cleaning up transactions with username: {}", user.getUsername());
+        limitRepository.deleteLimitsByUsername(user.getUsername());
+        log.info("Cleaning up limit with username: {}", user.getUsername());
     }
 
     @Transactional
     public void deleteUserByName(String name) {
-        Optional<User> user = userRepository.findUserByName(name);
-        isUserEmpty(user, "User with name: " + name + " not found");
+        User user = getUserByName(name);
         userRepository.deleteUserByName(name);
         log.info("Deleting user {} by name", user);
+        cleanUpInOtherTables(user);
     }
 
-    @Transactional
-    public void deleteUserByEmail(String email) {
-        Optional<User> user = userRepository.findUserByEmail(email);
-        isUserEmpty(user, "User with email: " + email + " not found");
-        userRepository.deleteUserByEmail(email);
-        log.info("Deleting user {} by email", user);
-    }
-
-    public void create(User user) {
+    public void create(User user, long limit) {
         trimFields(user);
-        user.setAge(calculateAgeByBirth(user.getBirth()));
         try {
             userRepository.save(user);
+            limitService.saveLimit(LimitTracker.builder()
+                    .username(user.getUsername())
+                    .limitAmount(limit)
+                    .totalAmount(0L)
+                    .build());
         } catch (Exception e) {
-            throw new EntityAlreadyExistsException("User's fields make duplicate");
+            throw new InvalidEntityException(e.getMessage());
         }
         log.info("Creating user {}", user);
     }
 
+    private void trimFields(User user) {
+        user.setUsername(user.getUsername().trim());
+        user.setEmail(user.getEmail().trim());
+        user.setPassword(user.getPassword().trim());
+    }
+
     @Transactional
-    public void update(Long id, User user) {
+    public void update(long id, User user) {
         trimFields(user);
-        user.setAge(calculateAgeByBirth(user.getBirth()));
         try {
             if (!userRepository.existsById(id)) {
                 userRepository.save(user);
                 log.info("Create user {}", user);
                 return;
             }
-            userRepository.updateUser(id,
+            updateUsernameOfAnotherEntities(user.getUsername(), id);
+            userRepository.updateUser(
+                    user.getId(),
                     user.getEmail(),
                     user.getUsername(),
                     user.getPassword(),
-                    user.getBirth(),
-                    user.getAge());
-            log.info("Update user {} since user with id: {}", user, id);
+                    user.getBirth());
         } catch (Exception e) {
-            throw new EntityAlreadyExistsException("User's fields make duplicate");
+            throw new InvalidEntityException(e.getMessage());
         }
+        log.info("Update user {} since user with id: {}", user, id);
+    }
+
+    private void updateUsernameOfAnotherEntities(String username, long id) {
+        transactionRepository.updateName(username, getUserById(id).getUsername());
+        limitRepository.updateUsername(username, getUserById(id).getUsername());
     }
 
     @Transactional
-    public void updateName(Long id, String name) {
+    public void updateName(long id, String name) {
         isUserExistsById(id);
         try {
+            updateUsernameOfAnotherEntities(name, id);
             userRepository.updateName(id, name);
+            log.info("Updating user name {} with id: {}", name, id);
         } catch (Exception e) {
-            throw new EntityAlreadyExistsException("User's fields make duplicate");
+            throw new InvalidEntityException(e.getMessage());
         }
-        log.info("Updating user name {} with id: {}", name, id);
     }
 
-    private void isUserExistsById(Long id) {
+    private void isUserExistsById(long id) {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User with id: " + id + " not found");
         }
     }
 
     @Transactional
-    public void updateEmail(Long id, String email) {
+    public void updateEmail(long id, String email) {
         isUserExistsById(id);
         try {
             userRepository.updateEmail(id, email);
@@ -128,33 +139,11 @@ public class UserService {
     }
 
     @Transactional
-    public void updateBirth(Long id, LocalDate birth) {
-        isUserExistsById(id);
-        int age = calculateAgeByBirth(birth);
-        userRepository.updateBirth(id, birth, age);
-        log.info("Updating user birth {} and age {} with id: {}", birth, age, id);
-    }
-
-    @Transactional
-    public void updatePassword(Long id, String password) {
+    public void updatePassword(long id, String password) {
         isUserExistsById(id);
         userRepository.updatePassword(id, password);
         log.info("Updating user password {} with id: {}", password, id);
 
     }
 
-    private int calculateAgeByBirth(LocalDate birth) {
-        return Period.between(birth, LocalDate.now()).getYears();
-    }
-    private void isUserEmpty(Optional<User> user, String message) {
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException(message);
-        }
-    }
-
-    private void trimFields(User user) throws NullPointerException {
-        user.setUsername(user.getUsername().trim());
-        user.setEmail(user.getEmail().trim());
-        user.setPassword(user.getPassword().trim());
-    }
 }

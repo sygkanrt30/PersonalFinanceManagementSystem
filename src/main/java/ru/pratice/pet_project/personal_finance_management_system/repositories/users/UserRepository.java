@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query(value = "select * from users where name = :name", nativeQuery = true)
+    @Query(value = "select * from users where username = :name", nativeQuery = true)
     Optional<User> findUserByName(String name);
 
     @Query(value = "select * from users where email = :email", nativeQuery = true)
@@ -18,40 +18,31 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query(value = "delete from users where id= :id", nativeQuery = true)
-    void deleteUserById(Long id);
+    void deleteUserById(long id);
 
     @Modifying
-    @Query(value = "delete from users where name= :name", nativeQuery = true)
+    @Query(value = "delete from users where username= :name", nativeQuery = true)
     void deleteUserByName(String name);
-
-    @Modifying
-    @Query(value = "delete from users where email= :email", nativeQuery = true)
-    void deleteUserByEmail(String email);
 
     @Modifying
     @Query(value = "update users set " +
             "email = :email, " +
-            "name = :name, " +
+            "username = :name, " +
             "password = :password, " +
-            "birth = :birthday, " +
-            "age = :age " +
+            "birth = :birthday " +
             "where id = :id",
             nativeQuery = true)
-    void updateUser(Long id, String email, String name, String password, LocalDate birthday, Integer age);
+    void updateUser(long id, String email, String name, String password, LocalDate birthday);
 
     @Modifying
-    @Query(value = "update users set name = :name where id= :id", nativeQuery = true)
-    void updateName(Long id, String name);
+    @Query(value = "update users set username = :name where id= :id", nativeQuery = true)
+    void updateName(long id, String name);
 
     @Modifying
     @Query(value = "update users set email = :email where id= :id", nativeQuery = true)
-    void updateEmail(Long id, String email);
+    void updateEmail(long id, String email);
 
     @Modifying
     @Query(value = "update users set password = :password where id= :id", nativeQuery = true)
-    void updatePassword(Long id, String password);
-
-    @Modifying
-    @Query(value = "update users set birth = :birth, age = :age where id= :id", nativeQuery = true)
-    void updateBirth(Long id, LocalDate birth, int age);
+    void updatePassword(long id, String password);
 }

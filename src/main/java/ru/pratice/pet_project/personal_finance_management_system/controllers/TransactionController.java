@@ -12,15 +12,10 @@ import java.util.List;
 @RequestMapping("api/transactions")
 @AllArgsConstructor
 public class TransactionController {
-    private final TransactionService transactionService;
-
-    @GetMapping
-    public List<Transaction> getTransactions() {
-        return transactionService.getTransactions();
-    }
+    TransactionService transactionService;
 
     @GetMapping(path = "{id}")
-    public Transaction getTransaction(@PathVariable(name = "id") Long id) {
+    public Transaction getTransaction(@PathVariable(name = "id") long id) {
         return transactionService.getTransactionById(id);
     }
 
@@ -30,15 +25,10 @@ public class TransactionController {
     }
 
     @GetMapping(path = "/get_by_category")
-    public List<Transaction> getTransactionsByCategory(@RequestParam Long categoryId,
+    public List<Transaction> getTransactionsByCategory(@RequestParam long categoryId,
                                                        @RequestParam String username,
                                                        @RequestParam String type) {
         return transactionService.getTransactionsByCategory(categoryId, username.trim(), type.trim());
-    }
-
-    @GetMapping(path = "/get_by_date/{date}")
-    public List<Transaction> getTransactionsByDate(@PathVariable(name = "date") LocalDate date) {
-        return transactionService.getTransactionsByDate(date);
     }
 
     @GetMapping("/filtered_by_type")
@@ -50,17 +40,17 @@ public class TransactionController {
     @GetMapping("/filtered_by_month")
     public List<Transaction> getFilteredTransactionsByMonth(@RequestParam String username,
                                                             @RequestParam String type,
-                                                            @RequestParam(required = false) Short minMonth,
-                                                            @RequestParam(required = false) Short maxMonth,
-                                                            @RequestParam Integer year) {
+                                                            @RequestParam(required = false) short minMonth,
+                                                            @RequestParam(required = false) short maxMonth,
+                                                            @RequestParam int year) {
         return transactionService.getFilteredByMonthsTransactions(type.trim(), username.trim(), minMonth, maxMonth, year);
     }
 
     @GetMapping("/filtered_by_amount")
     public List<Transaction> getFilteredByAmountTransactions(@RequestParam String username,
                                                              @RequestParam String type,
-                                                             @RequestParam(required = false) Long minAmount,
-                                                             @RequestParam Long maxAmount) {
+                                                             @RequestParam(required = false) long minAmount,
+                                                             @RequestParam long maxAmount) {
         return transactionService.getFilteredByAmountTransactions(type.trim(), username.trim(), minAmount, maxAmount);
     }
 
@@ -75,17 +65,17 @@ public class TransactionController {
     public List<Transaction> getFilteredByDateAndCategoryTransactions(@RequestParam String username,
                                                                       @RequestParam String type,
                                                                       @RequestParam LocalDate date,
-                                                                      @RequestParam Long categoryId) {
+                                                                      @RequestParam long categoryId) {
         return transactionService.getTransactionsByCategoryAndDate(username.trim(), type.trim(), date, categoryId);
     }
 
     @GetMapping("/filtered_by_month_and_category")
     public List<Transaction> getFilteredTransactionsByMonthAndCategory(@RequestParam String username,
                                                                        @RequestParam String type,
-                                                                       @RequestParam(required = false) Short minMonth,
-                                                                       @RequestParam(required = false) Short maxMonth,
-                                                                       @RequestParam Integer year,
-                                                                       @RequestParam Long categoryId) {
+                                                                       @RequestParam(required = false) short minMonth,
+                                                                       @RequestParam(required = false) short maxMonth,
+                                                                       @RequestParam int year,
+                                                                       @RequestParam long categoryId) {
         return transactionService.getFilteredByMonthsTransactions(type.trim(),
                 username.trim(),
                 minMonth,
@@ -97,20 +87,20 @@ public class TransactionController {
     @GetMapping("/sorted_by_amount")
     public List<Transaction> getSortedByAmountTransactions(@RequestParam String username,
                                                            @RequestParam String type,
-                                                           @RequestParam(required = false) Boolean isIncreasedSort) {
+                                                           @RequestParam(required = false) boolean isIncreasedSort) {
         return transactionService.getSortedByAmountTransactions(username.trim(), type.trim(), isIncreasedSort);
     }
 
     @GetMapping("/get_limited_number_of_transactions")
     public List<Transaction> getLimitedNumberOfTransactions(@RequestParam String username,
                                                             @RequestParam String type,
-                                                            @RequestParam Integer lowLimit,
-                                                            @RequestParam Integer highLimit) {
+                                                            @RequestParam int lowLimit,
+                                                            @RequestParam int highLimit) {
         return transactionService.getLimitedNumberOfTransactions(username.trim(), type.trim(), lowLimit, highLimit);
     }
 
     @DeleteMapping(path = "{id}")
-    public void deleteTransaction(@PathVariable(name = "id") Long id) {
+    public void deleteTransaction(@PathVariable(name = "id") long id) {
         transactionService.deleteTransactionById(id);
     }
 
@@ -131,27 +121,27 @@ public class TransactionController {
     }
 
     @PutMapping(path = "{id}")
-    public void updateTransaction(@PathVariable(name = "id") Long id, @RequestBody Transaction transaction) {
+    public void updateTransaction(@PathVariable(name = "id") long id, @RequestBody Transaction transaction) {
         transactionService.updateTransaction(id, transaction);
     }
 
     @PatchMapping("/update_amount")
-    public void updateAmount(@RequestParam Long id, @RequestParam Long amount) {
+    public void updateAmount(@RequestParam long id, @RequestParam long amount) {
         transactionService.updateAmount(id, amount);
     }
 
     @PatchMapping("/update_date")
-    public void updateDate(@RequestParam Long id, @RequestParam LocalDate date) {
+    public void updateDate(@RequestParam long id, @RequestParam LocalDate date) {
         transactionService.updateDate(id, date);
     }
 
     @PatchMapping("/update_description")
-    public void updateDescription(@RequestParam Long id, @RequestParam String description) {
+    public void updateDescription(@RequestParam long id, @RequestParam String description) {
         transactionService.updateDescription(id, description);
     }
 
     @PatchMapping("/update_category_id")
-    public void updateCategoryId(@RequestParam Long id, @RequestParam Long categoryId) {
+    public void updateCategoryId(@RequestParam long id, @RequestParam long categoryId) {
         transactionService.updateCategory(id, categoryId);
     }
 }

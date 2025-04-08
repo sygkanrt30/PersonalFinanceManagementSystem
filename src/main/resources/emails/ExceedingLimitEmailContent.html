@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уведомление о превышении лимита</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+        }
+        .message {
+            font-size: 16px;
+            color: #555555;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <strong>Превышение лимита в размере {{limitAmount}} рублей !!</strong>
+    </div>
+    <div class="message">
+        Ваше текущая сумма расходов: {{totalAmount}} рублей
+    </div>
+</div>
+</body>
+</html>

@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Modifying
     @Query(value = "update categories set name = :name where id= :id", nativeQuery = true)
-    void update(Long id, String name);
+    void update(long id, String name);
 
     @Query(value = "select * from categories where category_id = :categoryId", nativeQuery = true)
-    Optional<Category> findByCategoryId(Long categoryId);
+    Optional<Category> findByCategoryId(long categoryId);
 }

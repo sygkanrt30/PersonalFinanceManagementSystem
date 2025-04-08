@@ -19,9 +19,19 @@ public interface LimitRepository extends JpaRepository<LimitTracker, Long> {
 
     @Query(value = "update limits set limit_amount = :limitAmount where id = :id", nativeQuery = true)
     @Modifying
-    void updateLimitAmount(Long id, Long limitAmount);
+    void updateLimitAmount(long id, long limitAmount);
 
-    @Query(value = "update limits set total_amount = :totalAmount where id = :id", nativeQuery = true)
+    @Query(value = "update limits set total_amount = total_amount + :totalAmount where username = :username",
+            nativeQuery = true)
     @Modifying
-    void updateTotalAmount(Long id, Long totalAmount);
+    void incrementTotalAmount(String username, long totalAmount);
+
+    @Query(value = "update limits set total_amount =  total_amount - :totalAmount where username = :username",
+            nativeQuery = true)
+    @Modifying
+    void decrementTotalAmount(String username, long totalAmount);
+
+    @Query(value = "update limits set username = :username where username = :oldUsername", nativeQuery = true)
+    @Modifying
+    void updateUsername(String username, String oldUsername);
 }

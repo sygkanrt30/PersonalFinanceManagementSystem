@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/categories")
 public class CategoryController {
-    private CategoryService categoryService;
+    CategoryService categoryService;
 
     @GetMapping
     public List<Category> getAllCategories() {
@@ -19,17 +19,12 @@ public class CategoryController {
     }
 
     @GetMapping(path = "{id}")
-    public Category getCategory(@PathVariable(name = "id") Long id) {
+    public Category getCategory(@PathVariable(name = "id") long id) {
         return categoryService.getCategoryById(id);
     }
-
-    @DeleteMapping
-    public void deleteAllCategories() {
-        categoryService.deleteAllCategories();
-    }
-
+    //служебный endpoint
     @DeleteMapping(path = "{id}")
-    public void deleteCategory(@PathVariable(name = "id") Long id) {
+    public void deleteCategory(@PathVariable(name = "id") long id) {
         categoryService.deleteCategoryById(id);
     }
 
@@ -39,7 +34,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/update_name")
-    public void updateCategory(@RequestParam Long id, @RequestParam String name) {
+    public void updateCategory(@RequestParam long id, @RequestParam String name) {
         categoryService.updateName(id, name.trim());
     }
 }
