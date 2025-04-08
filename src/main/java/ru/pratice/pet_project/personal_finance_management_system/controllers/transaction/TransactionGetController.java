@@ -1,40 +1,40 @@
-package ru.pratice.pet_project.personal_finance_management_system.controllers;
+package ru.pratice.pet_project.personal_finance_management_system.controllers.transaction;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.Transaction;
-import ru.pratice.pet_project.personal_finance_management_system.services.transactions.TransactionService;
+import ru.pratice.pet_project.personal_finance_management_system.services.transactions.TransactionGetService;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/transactions")
+@RequestMapping("api/transactions_get")
 @AllArgsConstructor
-public class TransactionController {
-    TransactionService transactionService;
+public class TransactionGetController {
+    TransactionGetService transactionGetService;
 
     @GetMapping(path = "{id}")
     public Transaction getTransaction(@PathVariable(name = "id") long id) {
-        return transactionService.getTransactionById(id);
+        return transactionGetService.getTransactionById(id);
     }
 
-    @GetMapping(path = "/get_by_username/{username}")
+    @GetMapping(path = "/by_username/{username}")
     public List<Transaction> getFilteredTransactionsByUsername(@PathVariable(name = "username") String username) {
-        return transactionService.getTransactionsByUsername(username.trim());
+        return transactionGetService.getTransactionsByUsername(username.trim());
     }
 
-    @GetMapping(path = "/get_by_category")
+    @GetMapping(path = "/by_category")
     public List<Transaction> getTransactionsByCategory(@RequestParam long categoryId,
                                                        @RequestParam String username,
                                                        @RequestParam String type) {
-        return transactionService.getTransactionsByCategory(categoryId, username.trim(), type.trim());
+        return transactionGetService.getTransactionsByCategory(categoryId, username.trim(), type.trim());
     }
 
     @GetMapping("/filtered_by_type")
     public List<Transaction> getFilteredTransactionsByType(@RequestParam String type,
                                                            @RequestParam String username) {
-        return transactionService.getTransactionsByType(type.trim(), username.trim());
+        return transactionGetService.getTransactionsByType(type.trim(), username.trim());
     }
 
     @GetMapping("/filtered_by_month")
@@ -43,7 +43,7 @@ public class TransactionController {
                                                             @RequestParam(required = false) short minMonth,
                                                             @RequestParam(required = false) short maxMonth,
                                                             @RequestParam int year) {
-        return transactionService.getFilteredByMonthsTransactions(type.trim(), username.trim(), minMonth, maxMonth, year);
+        return transactionGetService.getFilteredByMonthsTransactions(type.trim(), username.trim(), minMonth, maxMonth, year);
     }
 
     @GetMapping("/filtered_by_amount")
@@ -51,14 +51,14 @@ public class TransactionController {
                                                              @RequestParam String type,
                                                              @RequestParam(required = false) long minAmount,
                                                              @RequestParam long maxAmount) {
-        return transactionService.getFilteredByAmountTransactions(type.trim(), username.trim(), minAmount, maxAmount);
+        return transactionGetService.getFilteredByAmountTransactions(type.trim(), username.trim(), minAmount, maxAmount);
     }
 
     @GetMapping("/filtered_by_date")
     public List<Transaction> getFilteredByDateTransactions(@RequestParam String username,
                                                            @RequestParam String type,
                                                            @RequestParam LocalDate date) {
-        return transactionService.getTransactionsByDate(username.trim(), type.trim(), date);
+        return transactionGetService.getTransactionsByDate(username.trim(), type.trim(), date);
     }
 
     @GetMapping("/filtered_by_date_and_category")
@@ -66,7 +66,7 @@ public class TransactionController {
                                                                       @RequestParam String type,
                                                                       @RequestParam LocalDate date,
                                                                       @RequestParam long categoryId) {
-        return transactionService.getTransactionsByCategoryAndDate(username.trim(), type.trim(), date, categoryId);
+        return transactionGetService.getTransactionsByCategoryAndDate(username.trim(), type.trim(), date, categoryId);
     }
 
     @GetMapping("/filtered_by_month_and_category")
@@ -76,7 +76,7 @@ public class TransactionController {
                                                                        @RequestParam(required = false) short maxMonth,
                                                                        @RequestParam int year,
                                                                        @RequestParam long categoryId) {
-        return transactionService.getFilteredByMonthsTransactions(type.trim(),
+        return transactionGetService.getFilteredByMonthsTransactions(type.trim(),
                 username.trim(),
                 minMonth,
                 maxMonth,
@@ -88,105 +88,14 @@ public class TransactionController {
     public List<Transaction> getSortedByAmountTransactions(@RequestParam String username,
                                                            @RequestParam String type,
                                                            @RequestParam(required = false) boolean isIncreasedSort) {
-        return transactionService.getSortedByAmountTransactions(username.trim(), type.trim(), isIncreasedSort);
+        return transactionGetService.getSortedByAmountTransactions(username.trim(), type.trim(), isIncreasedSort);
     }
 
-    @GetMapping("/get_limited_number_of_transactions")
+    @GetMapping("/limited_number_of_transactions")
     public List<Transaction> getLimitedNumberOfTransactions(@RequestParam String username,
                                                             @RequestParam String type,
                                                             @RequestParam int lowLimit,
                                                             @RequestParam int highLimit) {
-        return transactionService.getLimitedNumberOfTransactions(username.trim(), type.trim(), lowLimit, highLimit);
-    }
-
-    @DeleteMapping(path = "{id}")
-    public void deleteTransaction(@PathVariable(name = "id") long id) {
-        transactionService.deleteTransactionById(id);
-    }
-
-    @DeleteMapping(path = "/delete_by_username/{username}")
-    public void deleteTransactionByUsername(@PathVariable(name = "username") String username) {
-        transactionService.deleteTransactionsByUsername(username.trim());
-    }
-
-    @DeleteMapping("/delete_by_type")
-    public void deleteTransactionByType(@RequestParam String type,
-                                        @RequestParam String username) {
-        transactionService.deleteTransactionsByType(type.trim(), username.trim());
-    }
-
-    @PostMapping("/create")
-    public void createTransaction(@RequestBody Transaction transaction) {
-        transactionService.saveTransaction(transaction);
-    }
-
-    @PutMapping(path = "{id}")
-    public void updateTransaction(@PathVariable(name = "id") long id, @RequestBody Transaction transaction) {
-        transactionService.updateTransaction(id, transaction);
-    }
-
-    @PatchMapping("/update_amount")
-    public void updateAmount(@RequestParam long id, @RequestParam long amount) {
-        transactionService.updateAmount(id, amount);
-    }
-
-    @PatchMapping("/update_date")
-    public void updateDate(@RequestParam long id, @RequestParam LocalDate date) {
-        transactionService.updateDate(id, date);
-    }
-
-    @PatchMapping("/update_description")
-    public void updateDescription(@RequestParam long id, @RequestParam String description) {
-        transactionService.updateDescription(id, description);
-    }
-
-    @PatchMapping("/update_category_id")
-    public void updateCategoryId(@RequestParam long id, @RequestParam long categoryId) {
-        transactionService.updateCategory(id, categoryId);
+        return transactionGetService.getLimitedNumberOfTransactions(username.trim(), type.trim(), lowLimit, highLimit);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

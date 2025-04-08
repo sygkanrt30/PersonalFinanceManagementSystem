@@ -145,5 +145,4 @@ public class UserService {
         log.info("Updating user password {} with id: {}", password, id);
 
     }
-
 }

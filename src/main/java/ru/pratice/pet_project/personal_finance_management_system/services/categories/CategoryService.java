@@ -36,23 +36,31 @@ public class CategoryService {
     }
 
     public void saveCategory(Category category) {
+        save(category);
+        log.info("Saving category {}", category);
+    }
+
+    private void save(Category category) {
         try {
             category.setName(category.getName().trim());
             categoryRepository.save(category);
         } catch (Exception e) {
             throw new InvalidEntityException(e.getMessage());
         }
-        log.info("Saving category {}", category);
     }
 
     @Transactional
     public void updateName(long id, String name) {
         getCategoryById(id);
+        update(id, name);
+        log.info("Updating category with id: {}", id);
+    }
+
+    private void update(long id, String name) {
         try {
             categoryRepository.update(id, name);
         } catch (Exception e) {
             throw new InvalidEntityException(e.getMessage());
         }
-        log.info("Updating category with id: {}", id);
     }
 }
