@@ -1,46 +1,33 @@
-package ru.pratice.pet_project.personal_finance_management_system.repositories.transactions;
+package ru.pratice.pet_project.personal_finance_management_system.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.lang.NonNull;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.categories.Category;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@AllArgsConstructor
+@SuppressWarnings("ALL")
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
-@Table(name = "transactions")
-public class Transaction {
+@Builder
+@AllArgsConstructor
+@Table(name = "limits")
+public class LimitTracker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false)
-    long amount;
-
     @NonNull
-    @Column(nullable = false)
-    LocalDate date;
-
-    @NonNull
-    @Column(nullable = false)
-    String type;
-
-    @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     String username;
 
-    String description;
+    @Column(name = "limit_amount", nullable = false)
+    long limitAmount;
 
-    @NonNull
-    @OneToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    Category category;
+    @Column(name = "total_amount", nullable = false)
+    long totalAmount;
 
     @Override
     public final boolean equals(Object o) {
@@ -49,7 +36,7 @@ public class Transaction {
         Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Transaction that = (Transaction) o;
+        LimitTracker that = (LimitTracker) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

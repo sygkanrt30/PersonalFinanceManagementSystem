@@ -2,8 +2,8 @@ package ru.pratice.pet_project.personal_finance_management_system.controllers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.users.User;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.users.UserRepository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.User;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.UserRepository;
 import ru.pratice.pet_project.personal_finance_management_system.services.users.UserService;
 
 import java.util.List;
@@ -20,27 +20,22 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "/get/{id}")
     public User getUserById(@PathVariable(name = "id") long id) {
         return userService.getUserById(id);
     }
 
-    @GetMapping(path = "/get_by_name/{name}")
+    @GetMapping(path = "/get_by-name/{name}")
     public User getUserByName(@PathVariable(name = "name") String name) {
         return userService.getUserByName(name.trim());
     }
 
-    @GetMapping(path = "/get_by_email/{email}")
-    public User getUserByEmail(@PathVariable(name = "email") String email) {
-        return userService.getUserByEmail(email.trim());
-    }
-
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/delete/{id}")
     public void deleteUserById(@PathVariable(name = "id") long id) {
         userService.deleteUserById(id);
     }
 
-    @DeleteMapping(path = "/delete_by_name/{name}")
+    @DeleteMapping(path = "/delete-name/{name}")
     public void deleteUserByName(@PathVariable(name = "name") String name) {
         userService.deleteUserByName(name.trim());
     }
@@ -50,18 +45,18 @@ public class UserController {
         userService.create(user, limit);
     }
 
-    @PutMapping(path = "{id}")
+    @PutMapping(path = "/update/{id}")
     public void updateUser(@PathVariable(name = "id") long id, @RequestBody User user) {
         userService.update(id, user);
     }
 
-    @PatchMapping("/update_username")
+    @PatchMapping("/update-username")
     public void updateUsername(@RequestParam long id,
                                @RequestParam String username) {
         userService.updateName(id, username.trim());
     }
 
-    @PatchMapping("/update_password")
+    @PatchMapping("/update-password")
     public void updatePassword(@RequestParam long id,
                                @RequestParam String password) {
         userService.updatePassword(id, password.trim());

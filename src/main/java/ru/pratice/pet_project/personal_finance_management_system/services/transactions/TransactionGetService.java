@@ -3,24 +3,20 @@ package ru.pratice.pet_project.personal_finance_management_system.services.trans
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.categories.Category;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.Transaction;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.TransactionRepository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.Category;
+import ru.pratice.pet_project.personal_finance_management_system.entities.Transaction;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.TransactionRepository;
 import ru.pratice.pet_project.personal_finance_management_system.services.categories.CategoryService;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidRequestException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class TransactionGetService {
-    static String INCOME_TYPE = "доход";
-    public static String CONSUMPTION_TYPE = "расход";
     TransactionRepository transactionRepository;
     CategoryService categoryService;
 
@@ -51,9 +47,7 @@ public class TransactionGetService {
             throw new InvalidRequestException("The minimum amount should be " +
                     "less than the maximum amount");
         }
-        return transactionRepository.findTransactionsByType(username, type).stream().filter(transaction ->
-                transaction.getAmount() >= minAmount &&
-                        transaction.getAmount() <= maxAmount).toList();
+        return transactionRepository.filteredByAmountTransactions(username, type, minAmount, maxAmount);
     }
 
     public List<Transaction> getFilteredByMonthsTransactions(String type,
@@ -112,19 +106,10 @@ public class TransactionGetService {
     }
 
     public List<Transaction> getSortedByAmountTransactions(String username, String type, boolean isIncreasedSort) {
-        List<Transaction> transactions = getTransactionsByType(username, type);
         if (isIncreasedSort) {
-            return sortTransactionsByIncreasingAmount(transactions).toList();
+            return transactionRepository.findAndSortedByAscTransactionsByType(username, type);
         }
-        return sortTransactionsByDecreasingAmount(transactions).toList();
-    }
-
-    private Stream<Transaction> sortTransactionsByIncreasingAmount(List<Transaction> transactions) {
-        return transactions.stream().sorted(Comparator.comparing(Transaction::getAmount));
-    }
-
-    private Stream<Transaction> sortTransactionsByDecreasingAmount(List<Transaction> transactions) {
-        return transactions.stream().sorted(Comparator.comparing(Transaction::getAmount).reversed());
+        return transactionRepository.findAndSortedByDescTransactionsByType(username, type);
     }
 
     public List<Transaction> getLimitedNumberOfTransactions(String username, String type,
@@ -140,8 +125,10 @@ public class TransactionGetService {
     }
 
     public void checkTypeForCorrectness(String type) {
-        if (!type.trim().equals(INCOME_TYPE) && !type.trim().equals(CONSUMPTION_TYPE)) {
-            throw new InvalidRequestException("The type should be '" + INCOME_TYPE + "' or '" + CONSUMPTION_TYPE + "'");
+        if (!type.trim().equals(TypeOfTransaction.INCOME_TYPE.name())
+                && !type.trim().equals(TypeOfTransaction.CONSUMPTION_TYPE.name())) {
+            throw new InvalidRequestException("The type should be '" + TypeOfTransaction.INCOME_TYPE.name()
+                    + "' or '" + TypeOfTransaction.CONSUMPTION_TYPE.name() + "'");
         }
     }
 }

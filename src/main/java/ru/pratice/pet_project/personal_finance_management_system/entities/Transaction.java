@@ -1,4 +1,4 @@
-package ru.pratice.pet_project.personal_finance_management_system.repositories.users;
+package ru.pratice.pet_project.personal_finance_management_system.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,32 +8,37 @@ import org.springframework.lang.NonNull;
 import java.time.LocalDate;
 import java.util.Objects;
 
+@SuppressWarnings("ALL")
 @Entity
-@Table(name = "users")
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
-public class User {
+@Table(name = "transactions")
+public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(nullable = false)
+    long amount;
+
     @NonNull
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
+    LocalDate date;
+
+    @NonNull
+    @Column(nullable = false)
+    String type;
+
+    @NonNull
+    @Column(nullable = false)
     String username;
 
-    @NonNull
-    @Column(nullable = false, unique = true)
-    String email;
+    String description;
 
     @NonNull
-    @Column(nullable = false)
-    String password;
-
-    @NonNull
-    @Column(nullable = false)
-    LocalDate birth;
+    @OneToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    Category category;
 
     @Override
     public final boolean equals(Object o) {
@@ -42,8 +47,8 @@ public class User {
         Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        User user = (User) o;
-        return getId() != null && Objects.equals(getId(), user.getId());
+        Transaction that = (Transaction) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override

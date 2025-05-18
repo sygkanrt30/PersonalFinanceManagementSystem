@@ -2,6 +2,7 @@ package ru.pratice.pet_project.personal_finance_management_system.services.inter
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,14 +17,11 @@ public class EmailSender {
     static String EMAIL_FROM = "financemanagmeentsystem@gmail.com";
     JavaMailSender mailSender;
 
+    @SneakyThrows
     public void sendEmail(Email email, String toEmail) {
-        try {
             MimeMessage message = createMimeMessage(email, toEmail);
             mailSender.send(message);
             log.info("Email sent to {}", toEmail);
-        } catch (Exception e) {
-            log.error("Failed to send email to {}: {}", toEmail, e.getMessage());
-        }
     }
 
     private MimeMessage createMimeMessage(Email email, String toEmail) throws Exception {

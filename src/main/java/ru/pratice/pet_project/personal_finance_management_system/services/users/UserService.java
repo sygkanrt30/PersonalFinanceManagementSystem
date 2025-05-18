@@ -4,16 +4,16 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.limits.LimitRepository;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.limits.LimitTracker;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.TransactionRepository;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.users.User;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.users.UserRepository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.LimitTracker;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.LimitRepository;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.TransactionRepository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.User;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.UserRepository;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 import ru.pratice.pet_project.personal_finance_management_system.services.limits.LimitService;
 
-@SuppressWarnings("ALL")
+
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -31,11 +31,6 @@ public class UserService {
     public User getUserByName(String name) {
         return userRepository.findUserByName(name).orElseThrow(
                 () -> new ResourceNotFoundException("User with name: " + name + " not found"));
-    }
-
-    public User getUserByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User with email: " + email + " not found"));
     }
 
     @Transactional
@@ -131,6 +126,5 @@ public class UserService {
         isUserExistsById(id);
         userRepository.updatePassword(id, password);
         log.info("Updating user password {} with id: {}", password, id);
-
     }
 }

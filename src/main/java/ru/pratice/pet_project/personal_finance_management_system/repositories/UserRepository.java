@@ -1,9 +1,10 @@
-package ru.pratice.pet_project.personal_finance_management_system.repositories.users;
+package ru.pratice.pet_project.personal_finance_management_system.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.User;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -12,9 +13,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "select * from users where username = :name", nativeQuery = true)
     Optional<User> findUserByName(String name);
-
-    @Query(value = "select * from users where email = :email", nativeQuery = true)
-    Optional<User> findUserByEmail(String email);
 
     @Modifying
     @Query(value = "delete from users where id= :id", nativeQuery = true)

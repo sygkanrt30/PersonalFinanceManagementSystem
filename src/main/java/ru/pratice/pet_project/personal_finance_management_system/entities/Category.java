@@ -1,33 +1,36 @@
-package ru.pratice.pet_project.personal_finance_management_system.repositories.limits;
+package ru.pratice.pet_project.personal_finance_management_system.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.lang.NonNull;
 
 import java.util.Objects;
 
+
 @Entity
-@AllArgsConstructor
+@SuppressWarnings("ALL")
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
-@Builder
-@Table(name = "limits")
-public class LimitTracker {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(name = "categories")
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @NonNull
     @Column(nullable = false, unique = true)
-    String username;
+    private String name;
 
-    @Column(name = "limit_amount", nullable = false)
-    long limitAmount;
-
-    @Column(name = "total_amount", nullable = false)
-    long totalAmount;
+    @JsonCreator
+    public Category(@JsonProperty("id") @NonNull long id,
+                    @JsonProperty("name") @NonNull String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     @Override
     public final boolean equals(Object o) {
@@ -36,8 +39,8 @@ public class LimitTracker {
         Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        LimitTracker that = (LimitTracker) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        Category category = (Category) o;
+        return getId() != null && Objects.equals(getId(), category.getId());
     }
 
     @Override

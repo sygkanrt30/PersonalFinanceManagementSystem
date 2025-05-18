@@ -2,7 +2,7 @@ package ru.pratice.pet_project.personal_finance_management_system.controllers.tr
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.Transaction;
+import ru.pratice.pet_project.personal_finance_management_system.entities.Transaction;
 import ru.pratice.pet_project.personal_finance_management_system.services.transactions.TransactionSaveAndUpdateService;
 
 import java.time.LocalDate;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class TransactionUpdateController {
     TransactionSaveAndUpdateService transactionService;
 
-    @PutMapping(path = "{id}")
+    @PutMapping(path = "/{id}")
     public void updateTransaction(@PathVariable(name = "id") long id, @RequestBody Transaction transaction) {
         transactionService.updateTransaction(id, transaction);
     }

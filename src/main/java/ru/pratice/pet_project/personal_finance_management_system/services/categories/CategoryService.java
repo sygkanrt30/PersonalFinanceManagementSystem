@@ -4,8 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.categories.Category;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.categories.CategoryRepository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.Category;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.CategoryRepository;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 

@@ -2,7 +2,7 @@ package ru.pratice.pet_project.personal_finance_management_system.controllers.tr
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.Transaction;
+import ru.pratice.pet_project.personal_finance_management_system.entities.Transaction;
 import ru.pratice.pet_project.personal_finance_management_system.services.transactions.TransactionDeleteService;
 import ru.pratice.pet_project.personal_finance_management_system.services.transactions.TransactionSaveAndUpdateService;
 
@@ -24,13 +24,13 @@ public class TransactionDeleteAndSaveController {
         transactionDeleteService.deleteTransactionsByUsername(username.trim());
     }
 
-    @DeleteMapping("/delete_by_type")
+    @DeleteMapping("/delete-by-type")
     public void deleteTransactionByType(@RequestParam String type,
                                         @RequestParam String username) {
         transactionDeleteService.deleteTransactionsByType(type.trim(), username.trim());
     }
 
-    @PostMapping("/create")
+    @PostMapping("/save")
     public void createTransaction(@RequestBody Transaction transaction) {
         transactionService.saveTransaction(transaction);
     }

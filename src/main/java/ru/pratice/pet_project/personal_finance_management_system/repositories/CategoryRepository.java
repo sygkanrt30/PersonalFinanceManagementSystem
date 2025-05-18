@@ -1,10 +1,11 @@
-package ru.pratice.pet_project.personal_finance_management_system.repositories.categories;
+package ru.pratice.pet_project.personal_finance_management_system.repositories;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.Category;
 
 import java.util.Optional;
 

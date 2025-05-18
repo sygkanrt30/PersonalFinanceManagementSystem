@@ -2,12 +2,12 @@ package ru.pratice.pet_project.personal_finance_management_system.services.inter
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 
@@ -20,16 +20,17 @@ public abstract class Email {
 
     public abstract void makeEmailContent();
 
+    @SuppressWarnings("All")
     protected String convertHtmlContentToString(String fileName) {
-        try (var fileInputStream = new FileInputStream("src/main/resources/emails/" + fileName)) {
+        try (var fileInputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
             return readFile(fileInputStream);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
-    private String readFile(FileInputStream fileInputStream) throws IOException {
+    @SneakyThrows
+    private String readFile(InputStream fileInputStream) {
         byte[] buffer = fileInputStream.readAllBytes();
         return new String(buffer, StandardCharsets.UTF_8);
     }

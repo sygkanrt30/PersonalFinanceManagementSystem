@@ -4,9 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.Transaction;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.TransactionRepository;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.users.User;
+import ru.pratice.pet_project.personal_finance_management_system.entities.Transaction;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.TransactionRepository;
+import ru.pratice.pet_project.personal_finance_management_system.entities.User;
 import ru.pratice.pet_project.personal_finance_management_system.services.categories.CategoryService;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
@@ -15,7 +15,6 @@ import ru.pratice.pet_project.personal_finance_management_system.services.users.
 
 import java.time.LocalDate;
 
-import static ru.pratice.pet_project.personal_finance_management_system.services.transactions.TransactionGetService.CONSUMPTION_TYPE;
 
 @Slf4j
 @Service
@@ -37,7 +36,7 @@ public class TransactionSaveAndUpdateService {
     }
 
     private void updateTotalAmountAfterSave(Transaction transaction) {
-        if (transaction.getType().equals(CONSUMPTION_TYPE)) {
+        if (transaction.getType().equals(TypeOfTransaction.CONSUMPTION_TYPE.name())) {
             User user = userService.getUserByName(transaction.getUsername());
             limitService.updateTotalAmountAfterSave(user, transaction.getAmount());
         }
@@ -76,14 +75,14 @@ public class TransactionSaveAndUpdateService {
         checkExistenceOfUserByUsername(transaction.getUsername());
     }
 
-    private void checkExistenceOfUserByUsername(String username) {
-        userService.getUserByName(username);
-    }
-
     private void checkAmountForCorrectness(long amount) {
         if (amount <= 0) {
             throw new InvalidEntityException("Amount must be greater than zero");
         }
+    }
+
+    private void checkExistenceOfUserByUsername(String username) {
+        userService.getUserByName(username);
     }
 
     @Transactional
@@ -95,13 +94,19 @@ public class TransactionSaveAndUpdateService {
         updateAmountOfExpenses(id, amount, true);
     }
 
+    private void isTransactionExistsById(long id) {
+        if (!transactionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Transaction with id: " + id + " not found");
+        }
+    }
+
     public void updateAmountOfExpenses(long id, long amount, boolean isUpdateMethod) {
         if (isTypeConsumption(id))
             updateTotalAmountInLimitTable(id, amount, isUpdateMethod);
     }
 
     private boolean isTypeConsumption(long id) {
-        return transactionGetService.getTransactionById(id).getType().equals(CONSUMPTION_TYPE);
+        return transactionGetService.getTransactionById(id).getType().equals(TypeOfTransaction.CONSUMPTION_TYPE.name());
     }
 
     private void updateTotalAmountInLimitTable(long id, long amount, boolean isUpdateMethod) {
@@ -133,12 +138,6 @@ public class TransactionSaveAndUpdateService {
         isTransactionExistsById(id);
         transactionRepository.updateDescription(id, description.trim());
         log.info("Updating the transaction description with id: {}", id);
-    }
-
-    private void isTransactionExistsById(long id) {
-        if (!transactionRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Transaction with id: " + id + " not found");
-        }
     }
 
     private void isThereCategoryInDatabase(long categoryId) {

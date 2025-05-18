@@ -3,15 +3,11 @@ package ru.pratice.pet_project.personal_finance_management_system.services.trans
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.Transaction;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.transactions.TransactionRepository;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.TransactionRepository;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 import ru.pratice.pet_project.personal_finance_management_system.services.limits.LimitService;
 import ru.pratice.pet_project.personal_finance_management_system.services.users.UserService;
 
-import java.util.List;
-
-import static ru.pratice.pet_project.personal_finance_management_system.services.transactions.TransactionGetService.CONSUMPTION_TYPE;
 
 @Slf4j
 @Service
@@ -31,18 +27,19 @@ public class TransactionDeleteService {
             transactionService.updateAmountOfExpenses(id, amount, false);
         } else
             throw new ResourceNotFoundException("Transaction with id: " + id + " not found");
-
     }
 
     public void deleteTransactionsByUsername(String username) {
-        long amount = receivesAmountFromTransactionList(transactionGetService.getTransactionsByUsername(username));
+        long amount = transactionRepository.sumOfTransactionsAmountWithTypeConsumption(username,
+                TypeOfTransaction.CONSUMPTION_TYPE.name());
         transactionRepository.deleteTransactionByUsername(username);
         log.info("Deleting transactions by username: {}", username);
         updateTotalAmountAfterDeleteByUsername(username, amount);
     }
 
     public void deleteTransactionsByType(String type, String username) {
-        long amount = receivesAmountFromTransactionList(transactionGetService.getTransactionsByType(type, username));
+        long amount = transactionRepository.sumOfTransactionsAmountWithTypeConsumption(username,
+                TypeOfTransaction.CONSUMPTION_TYPE.name());
         transactionRepository.deleteTransactionByType(type, username);
         log.info("Deleting transactions by type: {} and username: {}", type, username);
         updateTotalAmountAfterDeleteByUsername(username, amount);
@@ -50,12 +47,5 @@ public class TransactionDeleteService {
 
     private void updateTotalAmountAfterDeleteByUsername(String username, long amount) {
         limitService.updateTotalAmount(userService.getUserByName(username), 0L, amount);
-    }
-
-    private long receivesAmountFromTransactionList(List<Transaction> transactions) {
-        return transactions.stream()
-                .filter(t -> t.getType().equals(CONSUMPTION_TYPE))
-                .map(Transaction::getAmount)
-                .reduce(0L, Long::sum);
     }
 }

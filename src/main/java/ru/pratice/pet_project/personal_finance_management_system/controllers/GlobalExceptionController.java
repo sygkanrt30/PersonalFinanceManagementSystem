@@ -6,64 +6,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.*;
-
-import java.time.LocalTime;
+import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidRequestException;
+import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionController {
     @ExceptionHandler
-    public ResponseEntity<AppErrorHandler> catchResourceNotFoundException(ResourceNotFoundException e) {
-        log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new AppErrorHandler(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage(),
-                LocalTime.now()),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> catchResourceNotFoundException(ResourceNotFoundException e) {
+        return getAppErrorHandlerResponseEntity(e, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({InvalidRequestException.class, InvalidRequestException.class})
+    public ResponseEntity<String> catchInvalidEntityException(Exception e) {
+        return getAppErrorHandlerResponseEntity(e, HttpStatus.NOT_ACCEPTABLE);
     }
 
     @ExceptionHandler
-    public ResponseEntity<AppErrorHandler> catchEntityAlreadyExistsException(EntityAlreadyExistsException e) {
-        log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new AppErrorHandler(HttpStatus.CONFLICT.value(),
-                e.getMessage(),
-                LocalTime.now()),
-                HttpStatus.CONFLICT);
+    public ResponseEntity<String> catchBadRequestException(MissingServletRequestParameterException e) {
+        return getAppErrorHandlerResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<AppErrorHandler> catchInvalidEntityException(InvalidEntityException e) {
-        log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new AppErrorHandler(HttpStatus.BAD_REQUEST.value(),
-                e.getMessage(),
-                LocalTime.now()),
-                HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({NullPointerException.class, IllegalStateException.class})
+    public ResponseEntity<String> catchNullPointerException(Exception e) {
+        return getAppErrorHandlerResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<AppErrorHandler> catchInvalidRequestException(InvalidRequestException e) {
+    private ResponseEntity<String> getAppErrorHandlerResponseEntity(Exception e, HttpStatus status) {
         log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new AppErrorHandler(HttpStatus.BAD_REQUEST.value(),
-                e.getMessage(),
-                LocalTime.now()),
-                HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<AppErrorHandler> catchBadRequestException(MissingServletRequestParameterException e) {
-        log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new AppErrorHandler(HttpStatus.BAD_REQUEST.value(),
-                e.getMessage(),
-                LocalTime.now()),
-                HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<AppErrorHandler> catchBadRequestException(NullPointerException e) {
-        log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new AppErrorHandler(HttpStatus.BAD_REQUEST.value(),
-                e.getMessage(),
-                LocalTime.now()),
-                HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(status).body(e.getMessage());
     }
 }
