@@ -26,9 +26,6 @@ public class CategoryService {
                 () -> new ResourceNotFoundException("Category with id: " + id + " not found"));
     }
 
-    public boolean isCategoryExistsByCategoryId(long id) {
-        return categoryRepository.findByCategoryId(id).isPresent();
-    }
     public void deleteCategoryById(long id) {
         getCategoryById(id);
         categoryRepository.deleteById(id);

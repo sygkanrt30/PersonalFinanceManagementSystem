@@ -5,9 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.pratice.pet_project.personal_finance_management_system.entities.Transaction;
-import ru.pratice.pet_project.personal_finance_management_system.repositories.TransactionRepository;
 import ru.pratice.pet_project.personal_finance_management_system.entities.User;
-import ru.pratice.pet_project.personal_finance_management_system.services.categories.CategoryService;
+import ru.pratice.pet_project.personal_finance_management_system.repositories.TransactionRepository;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.InvalidEntityException;
 import ru.pratice.pet_project.personal_finance_management_system.services.exceptions.ResourceNotFoundException;
 import ru.pratice.pet_project.personal_finance_management_system.services.limits.LimitService;
@@ -21,7 +20,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TransactionSaveAndUpdateService {
     TransactionRepository transactionRepository;
-    CategoryService categoryService;
     UserService userService;
     LimitService limitService;
     TransactionGetService transactionGetService;
@@ -71,7 +69,6 @@ public class TransactionSaveAndUpdateService {
     private void checkTransaction(Transaction transaction) {
         transactionGetService.checkTypeForCorrectness(transaction.getType());
         checkAmountForCorrectness(transaction.getAmount());
-        isThereCategoryInDatabase(transaction.getCategory().getId());
         checkExistenceOfUserByUsername(transaction.getUsername());
     }
 
@@ -121,7 +118,6 @@ public class TransactionSaveAndUpdateService {
     @Transactional
     public void updateCategory(long id, long categoryId) {
         isTransactionExistsById(id);
-        isThereCategoryInDatabase(categoryId);
         transactionRepository.updateCategoryId(id, categoryId);
         log.info("Updating the transaction category with id: {}", id);
     }
@@ -138,11 +134,5 @@ public class TransactionSaveAndUpdateService {
         isTransactionExistsById(id);
         transactionRepository.updateDescription(id, description.trim());
         log.info("Updating the transaction description with id: {}", id);
-    }
-
-    private void isThereCategoryInDatabase(long categoryId) {
-        if (!categoryService.isCategoryExistsByCategoryId(categoryId)) {
-            throw new InvalidEntityException("The category does not exist");
-        }
     }
 }

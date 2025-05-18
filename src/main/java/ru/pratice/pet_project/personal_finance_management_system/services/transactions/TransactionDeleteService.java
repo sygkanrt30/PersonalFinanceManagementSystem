@@ -15,7 +15,7 @@ import ru.pratice.pet_project.personal_finance_management_system.services.users.
 public class TransactionDeleteService {
     LimitService limitService;
     TransactionGetService transactionGetService;
-    TransactionSaveAndUpdateService transactionService;
+    TransactionSaveAndUpdateService transactionSaveAndUpdateService;
     TransactionRepository transactionRepository;
     UserService userService;
 
@@ -24,7 +24,7 @@ public class TransactionDeleteService {
             log.info("Deleting transaction with id: {}", id);
             transactionRepository.deleteById(id);
             long amount = transactionGetService.getTransactionById(id).getAmount();
-            transactionService.updateAmountOfExpenses(id, amount, false);
+            transactionSaveAndUpdateService.updateAmountOfExpenses(id, amount, false);
         } else
             throw new ResourceNotFoundException("Transaction with id: " + id + " not found");
     }
@@ -33,7 +33,6 @@ public class TransactionDeleteService {
         long amount = transactionRepository.sumOfTransactionsAmountWithTypeConsumption(username,
                 TypeOfTransaction.CONSUMPTION_TYPE.name());
         transactionRepository.deleteTransactionByUsername(username);
-        log.info("Deleting transactions by username: {}", username);
         updateTotalAmountAfterDeleteByUsername(username, amount);
     }
 
@@ -41,11 +40,11 @@ public class TransactionDeleteService {
         long amount = transactionRepository.sumOfTransactionsAmountWithTypeConsumption(username,
                 TypeOfTransaction.CONSUMPTION_TYPE.name());
         transactionRepository.deleteTransactionByType(type, username);
-        log.info("Deleting transactions by type: {} and username: {}", type, username);
         updateTotalAmountAfterDeleteByUsername(username, amount);
     }
 
     private void updateTotalAmountAfterDeleteByUsername(String username, long amount) {
+        log.info("Deleting transactions by username: {}", username);
         limitService.updateTotalAmount(userService.getUserByName(username), 0L, amount);
     }
 }

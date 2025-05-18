@@ -19,9 +19,9 @@ public class EmailSender {
 
     @SneakyThrows
     public void sendEmail(Email email, String toEmail) {
-            MimeMessage message = createMimeMessage(email, toEmail);
-            mailSender.send(message);
-            log.info("Email sent to {}", toEmail);
+        MimeMessage message = createMimeMessage(email, toEmail);
+        mailSender.send(message);
+        log.info("Email sent to {}", toEmail);
     }
 
     private MimeMessage createMimeMessage(Email email, String toEmail) throws Exception {

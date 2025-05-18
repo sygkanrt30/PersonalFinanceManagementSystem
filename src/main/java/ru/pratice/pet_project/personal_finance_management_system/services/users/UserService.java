@@ -78,7 +78,6 @@ public class UserService {
 
     @Transactional
     public void update(long id, User user) {
-        trimFields(user);
         try {
             if (!userRepository.existsById(id)) {
                 userRepository.save(user);

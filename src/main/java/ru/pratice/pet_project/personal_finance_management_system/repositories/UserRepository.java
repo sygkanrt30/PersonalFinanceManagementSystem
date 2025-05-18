@@ -24,9 +24,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query(value = "update users set " +
-            "email = :email, " +
-            "username = :name, " +
-            "password = :password, " +
+            "email = trim(:email), " +
+            "username = trim(:name), " +
+            "password = trim(:password), " +
             "birth = :birthday " +
             "where id = :id",
             nativeQuery = true)
